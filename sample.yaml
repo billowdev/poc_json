@@ -1,0 +1,10 @@
+db:
+ # # # # TODO LOCAL 
+  host: "localhost"
+  port: "5434"
+  name: "poc-json"
+  username: "postgres"
+  password: "pwd1234!"
+  ssl_mode: "disable"
+  run_migrations: false
+  run_seeders: false
