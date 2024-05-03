@@ -3,9 +3,11 @@ module poc_json
 go 1.22.1
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/IBM/sarama v1.43.2
 	github.com/gofiber/fiber/v2 v2.52.4
 	github.com/spf13/viper v1.18.2
+	github.com/stretchr/testify v1.9.0
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.10
 )
@@ -41,6 +43,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect

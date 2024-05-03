@@ -61,7 +61,7 @@ type NotificationModel struct {
 	Title     string          `json:"title"`
 	Subtitle  string          `json:"subtitle"`
 	Message   string          `json:"message"`
-	Status    ST_NOTIFICATION `json:"status" gorm:"type:ENUM('new', 'info', 'error', 'warning')"`
+	Status    ST_NOTIFICATION `json:"status"`
 	CreatedAt time.Time       `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time       `json:"updated_at" gorm:"autoUpdateTime"`
 }
@@ -73,13 +73,12 @@ func (st *NotificationModel) TableName() string {
 }
 
 const (
-	EVT_ORDER_CREATED    = "order_created"
-	EVT_DOCUMENT_CREATED = "document_created"
+	EVT_NOTIFICATION = "notification"
+	// EVT_DOCUMENT_CREATED = "document_created"
 )
 
 var Topics = []string{
-	EVT_ORDER_CREATED,
-	EVT_DOCUMENT_CREATED,
+	EVT_NOTIFICATION,
 }
 
 type NOTI_TYPE string
@@ -106,4 +105,11 @@ type KafkaEvent struct {
 	Message          string      `json:"message"`
 	Timestamp        time.Time   `json:"timestamp"`
 	Status           NOTI_STATUS `json:"status"`
+}
+
+type STDocumentVersion struct {
+	PortOfLoading     string `json:"port_of_loading"`
+	PortOfDestination string `json:"port_of_destination"`
+	CompanyName       string `json:"company_name"`
+	Address           string `json:"address"`
 }

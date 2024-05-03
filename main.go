@@ -41,9 +41,11 @@ func main() {
 	params := configs.ProvideFiberHttpServiceParams()
 	fiberService := configs.InitializeHTTPService(params)
 	producer := configs.InitSaramaProducer()
+	
 	kafkaConsumerGroup := configs.InitSaramaConsumer()
 	notificationRepo := repositories.NewNotiRepo(ConDB)
 	notificationService := services.NewNotiSrv(notificationRepo)
+
 	notiHandler := handlers.NewNotiHandler(notificationService, kafkaConsumerGroup)
 
 	topics := models.Topics
@@ -53,9 +55,8 @@ func main() {
 	portString := fmt.Sprintf(":%v", params.Port)
 
 	err = fiberService.Listen(portString)
-
 	if err != nil {
-		panic("Failed to start golang Fiber server")
+		panic(fmt.Sprintf("Failed to start golang Fiber server %v", err))
 	}
 }
 
@@ -77,12 +78,12 @@ func AppContainer(app *fiber.App, db *gorm.DB, kafkaProducer *sarama.SyncProduce
 
 func API(route RouterDeps, db *gorm.DB, kafkaProducer *sarama.SyncProducer) {
 	documentRepo := repositories.NewDocumentRepo(db)
-	documentSrv := services.NewDocumentSrv(documentRepo, kafkaProducer)
+	documentSrv := services.NewDocumentSrv(documentRepo, kafkaProducer) // Remove the asterisk before kafkaProducer
 	documentHandler := handlers.NewDocumentHandler(documentSrv)
 
 	route.CreateDocumentRoute(documentHandler)
 }
 
 func (r RouterDeps) CreateDocumentRoute(h handlers.IDocumentHandlerInfs) {
-	r.route.Post("/document", h.HandleTest)
+	r.route.Get("/test", h.HandleTest)
 }

@@ -65,12 +65,8 @@ func (h *notiHandlerDeps) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 			log.Println("--------------------------------")
 		}
 	}()
+
 	for kafkaMessage := range claim.Messages() {
-		// var event map[string]interface{}
-		// if err := json.Unmarshal(kafkaMessage.Value, &event); err != nil {
-		// 	log.Printf("Error unmarshalling Kafka message: %v", err)
-		// 	continue
-		// }
 		var kafkaEvent models.KafkaEvent
 		if err := json.Unmarshal(kafkaMessage.Value, &kafkaEvent); err != nil {
 			log.Printf("Error unmarshalling Kafka message: %v", err)
