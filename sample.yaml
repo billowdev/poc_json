@@ -1,10 +1,18 @@
+app:
+  port: 80
+
 db:
  # # # # TODO LOCAL 
   host: "localhost"
   port: "5434"
   name: "poc-json"
   username: "postgres"
-  password: "pwd1234!"
+  password: "Dev1234!"
   ssl_mode: "disable"
   run_migrations: false
   run_seeders: false
+  
+kafka:
+  broker_urls:
+    - "localhost:9092"
+  consumer_group: "notification-consumer-group"
