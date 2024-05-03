@@ -1,4 +1,4 @@
-package main
+package configs
 
 import (
 	"log"
@@ -6,7 +6,7 @@ import (
 	"github.com/IBM/sarama"
 )
 
-func initSaramaProducer() *sarama.SyncProducer {
+func InitSaramaProducer() *sarama.SyncProducer {
 	// Initialize Sarama configuration
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForAll
@@ -22,7 +22,7 @@ func initSaramaProducer() *sarama.SyncProducer {
 	return &producer
 }
 
-func initSaramaConsumer() *sarama.ConsumerGroup {
+func InitSaramaConsumer() *sarama.ConsumerGroup {
 	// Initialize Sarama configuration
 	config := sarama.NewConfig()
 	config.Consumer.Group.Rebalance.Strategy = sarama.NewBalanceStrategyRoundRobin()

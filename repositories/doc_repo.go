@@ -1,16 +1,16 @@
-package main
+package repositories
 
 import "gorm.io/gorm"
 
 type (
-	IRepositoryInfs interface {
+	IDocumentRepoInfs interface {
 		GetTest() string
 	}
 	repositoryDeps struct {
 		db *gorm.DB
 	}
 )
-func NewRepository(db *gorm.DB) IRepositoryInfs {
+func NewDocumentRepo(db *gorm.DB) IDocumentRepoInfs {
 	return &repositoryDeps{
 		db: db,
 	}

@@ -1,10 +1,10 @@
-package main
+package models
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
-
-
 
 type DocumentCategoryModel struct {
 	gorm.Model
@@ -12,7 +12,9 @@ type DocumentCategoryModel struct {
 	DocumentName string `json:"document_name"`
 	Template     JSONB  `json:"template"`
 }
+
 var TNDocumentCategory = "document_categories"
+
 func (st *DocumentCategoryModel) TableName() string {
 	return TNDocumentCategory
 }
@@ -55,14 +57,53 @@ const (
 
 type NotificationModel struct {
 	gorm.Model
-	ID       uint            `json:"id" gorm:"unique;primaryKey;autoIncrement"`
-	Title    uint            `json:"title"`
-	Subtitle string          `json:"subtitle"`
-	Status   ST_NOTIFICATION `json:"status" gorm:"type:ENUM('new', 'info', 'error', 'warning')"`
+	ID        uint            `json:"id" gorm:"unique;primaryKey;autoIncrement"`
+	Title     string          `json:"title"`
+	Subtitle  string          `json:"subtitle"`
+	Message   string          `json:"message"`
+	Status    ST_NOTIFICATION `json:"status" gorm:"type:ENUM('new', 'info', 'error', 'warning')"`
+	CreatedAt time.Time       `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time       `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
 var TNNotification = "notifications"
 
 func (st *NotificationModel) TableName() string {
 	return TNNotification
+}
+
+const (
+	EVT_ORDER_CREATED    = "order_created"
+	EVT_DOCUMENT_CREATED = "document_created"
+)
+
+var Topics = []string{
+	EVT_ORDER_CREATED,
+	EVT_DOCUMENT_CREATED,
+}
+
+type NOTI_TYPE string
+
+const (
+	NOTI_TYPE_INFO    NOTI_TYPE = "info"
+	NOTI_TYPE_WARNING NOTI_TYPE = "warning"
+	NOTI_TYPE_ERROR   NOTI_TYPE = "error"
+	NOTI_TYPE_SUCCESS NOTI_TYPE = "success"
+)
+
+type NOTI_STATUS string
+
+const (
+	NOTI_STATUS_UNREAD   NOTI_STATUS = "UNREAD"
+	NOTI_STATUS_READ     NOTI_STATUS = "READ"
+	NOTI_STATUS_ARCHIVED NOTI_STATUS = "ARCHIVED"
+)
+
+type KafkaEvent struct {
+	EventType        string      `json:"event_type"`
+	NotificationType NOTI_TYPE   `json:"notification_type"`
+	Title            string      `json:"title"`
+	Message          string      `json:"message"`
+	Timestamp        time.Time   `json:"timestamp"`
+	Status           NOTI_STATUS `json:"status"`
 }
