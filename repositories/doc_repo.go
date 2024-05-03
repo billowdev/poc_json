@@ -11,7 +11,7 @@ type (
 		GetTest() error
 
 		HelperCreateDocumentVersion(tx *gorm.DB, p *models.DocumentVersionModel) error
-
+		GetDocumentVersion(versionID string) (*models.DocumentVersionModel, error)
 		BeginTransaction() (*gorm.DB, error)
 	}
 	repoDeps struct {
@@ -19,10 +19,15 @@ type (
 	}
 )
 
+
 func NewDocumentRepo(db *gorm.DB) IDocumentRepoInfs {
 	return &repoDeps{
 		db: db,
 	}
+}
+// GetDocumentVersion implements IDocumentRepoInfs.
+func (r *repoDeps) GetDocumentVersion(versionID string) (*models.DocumentVersionModel, error) {
+	panic("unimplemented")
 }
 
 // HelperCreateDocumentVersion implements IDocumentRepoInfs.

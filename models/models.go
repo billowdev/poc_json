@@ -34,10 +34,12 @@ func (st *DocumentModel) TableName() string {
 
 type DocumentVersionModel struct {
 	gorm.Model
-	ID          uint   `json:"id" gorm:"unique;primaryKey;autoIncrement"`
-	Version     uint   `json:"version"`
-	VersionType string `json:"version_type"`
-	Value       JSONB  `json:"value"`
+	ID          uint      `json:"id" gorm:"unique;primaryKey;autoIncrement"`
+	Version     uint      `json:"version"`
+	VersionType string    `json:"version_type"`
+	Value       JSONB     `json:"value"`
+	CreatedAt   time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt   time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
 var TNDocumentVersion = "document_versions"

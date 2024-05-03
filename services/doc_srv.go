@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"log"
+	"poc_json/dto"
 	"poc_json/models"
 	"poc_json/repositories"
 	"poc_json/utils"
@@ -13,24 +14,25 @@ import (
 type (
 	IDocumentSrvInfs interface {
 		GetTest() error
-		CreateDocumentVersion(p models.DocumentVersionModel) error
+		CreateDocumentVersion(p *models.DocumentVersionModel) error
+		GetDocumentVersion(versionID string) (dto.SDocumentVersionResponse, error)
 	}
 	serviceDeps struct {
 		kafkaProducer *sarama.SyncProducer
-		repo          repositories.IDocumentRepoInfs
+		documentRepo  repositories.IDocumentRepoInfs
 	}
 )
 
-func NewDocumentSrv(repo repositories.IDocumentRepoInfs, kafkaProducer *sarama.SyncProducer) IDocumentSrvInfs {
+func NewDocumentSrv(documentRepo repositories.IDocumentRepoInfs, kafkaProducer *sarama.SyncProducer) IDocumentSrvInfs {
 	return &serviceDeps{
 		kafkaProducer: kafkaProducer,
-		repo:          repo,
+		documentRepo:  documentRepo,
 	}
 }
 
 // CreateDocumentVersion implements IDocumentSrvInfs.
-func (s *serviceDeps) CreateDocumentVersion(p models.DocumentVersionModel) error {
-	tx, err := s.repo.BeginTransaction()
+func (s *serviceDeps) CreateDocumentVersion(p *models.DocumentVersionModel) error {
+	tx, err := s.documentRepo.BeginTransaction()
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -46,7 +48,7 @@ func (s *serviceDeps) CreateDocumentVersion(p models.DocumentVersionModel) error
 		eventJSON, err := json.Marshal(event)
 		if err != nil {
 			log.Printf("Error marshalling order event: %v", err)
-			tx.Rollback()
+			return err
 		}
 
 		_, _, err = producer.SendMessage(&sarama.ProducerMessage{
@@ -54,13 +56,19 @@ func (s *serviceDeps) CreateDocumentVersion(p models.DocumentVersionModel) error
 			Value: sarama.StringEncoder(eventJSON),
 		})
 		if err != nil {
-			tx.Rollback()
+			return err
 		}
+	}
+
+	if err := s.documentRepo.HelperCreateDocumentVersion(tx, p); err != nil {
+		tx.Rollback()
+		return err
 	}
 	return nil
 }
+
 func (s *serviceDeps) GetTest() error {
-	tx, err := s.repo.BeginTransaction()
+	tx, err := s.documentRepo.BeginTransaction()
 	if err != nil {
 		return err
 	}
@@ -102,4 +110,22 @@ func (s *serviceDeps) GetTest() error {
 	}
 
 	return err
+}
+
+// GetDocumentVersion implements IDocumentSrvInfs.
+func (s *serviceDeps) GetDocumentVersion(versionID string) (dto.SDocumentVersionResponse, error) {
+	r, err := s.documentRepo.GetDocumentVersion(versionID)
+	if err != nil {
+		return dto.SDocumentVersionResponse{}, err
+	}
+	if r == nil {
+		return dto.SDocumentVersionResponse{}, nil
+	}
+
+	return dto.SDocumentVersionResponse{
+		ID:          r.ID,
+		Version:     r.Version,
+		VersionType: r.VersionType,
+		Value:       r.Value,
+	}, nil
 }

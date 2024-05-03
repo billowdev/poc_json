@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"poc_json/dto"
 	"poc_json/models"
 	"poc_json/services"
 	"poc_json/utils"
@@ -11,11 +12,14 @@ import (
 type (
 	IDocumentHandlerInfs interface {
 		HandleTest(c *fiber.Ctx) error
+		HandleGetDocumentVersion(c *fiber.Ctx) error
 	}
 	handlerDeps struct {
 		documentSrv services.IDocumentSrvInfs
 	}
 )
+
+
 
 func NewDocumentHandler(documentSrv services.IDocumentSrvInfs) IDocumentHandlerInfs {
 	return &handlerDeps{
@@ -33,14 +37,23 @@ func (h *handlerDeps) HandleTest(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	if err := h.documentSrv.CreateDocumentVersion(models.DocumentVersionModel{
+	version := models.DocumentVersionModel{
 		Version:     1,
 		VersionType: "ORIGINAL",
 		Value:       p,
-	}); err != nil {
-		return utils.NewResponse[interface{}](c, "E-400", "Test successfully", nil)
 	}
-	return c.JSON(fiber.Map{
-		"message": h.documentSrv.GetTest(),
+	if err := h.documentSrv.CreateDocumentVersion(&version); err != nil {
+		return utils.NewResponse[interface{}](c, "E-000", "Test Failed", nil)
+	}
+	return utils.NewResponse[interface{}](c, "S-000", "Test successfully", dto.SDocumentVersionResponse{
+		ID:          version.ID,
+		Version:     version.Version,
+		VersionType: version.VersionType,
+		Value:       version.Value,
 	})
+}
+
+// HandleGetDocumentVersion implements IDocumentHandlerInfs.
+func (h *handlerDeps) HandleGetDocumentVersion(c *fiber.Ctx) error {
+	panic("unimplemented")
 }

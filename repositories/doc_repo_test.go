@@ -39,17 +39,27 @@ func TestHelperCreateDocumentVersion(t *testing.T) {
 	}
 
 	t.Run("success", func(t *testing.T) {
+		// t.Log("Running SUCCESS test case")
+		// t.Log("Setting up mock expectations")
+
 		mock.ExpectBegin()
 		mock.ExpectQuery(regexp.QuoteMeta(
 			`INSERT INTO "document_versions" ("created_at","updated_at","deleted_at","version","version_type","value") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "id","id"`,
 		)).WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), nil, 1, "DRAFT", p).WillReturnRows(sqlmock.NewRows([]string{"id", "id"}).AddRow(1, 1))
 		mock.ExpectCommit()
 
+		// t.Log("Starting transaction and calling HelperCreateDocumentVersion")
+
 		tx := gormDB.Begin()
 		err := repo.HelperCreateDocumentVersion(tx, &docVersion)
-		t.Log(docVersion.CreatedAt)
-		t.Log("Success case passed")
+
+		if err != nil {
+			t.Logf("Error occurred: %v", err)
+		} 
 		require.NoError(t, err)
+
+		// t.Log("SUCCESS test case completed")
+		// t.Log("----------------------")
 	})
 
 	t.Run("error", func(t *testing.T) {
